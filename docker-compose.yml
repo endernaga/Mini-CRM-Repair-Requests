@@ -2,9 +2,10 @@ version: "3.9"
 
 services:
   web:
-    build: .
+    image: endernaga/repairapp:latest
     container_name: fastapi_app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     ports:
       - "8000:8000"
     env_file:
@@ -12,7 +13,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .:/app  # щоб код автоматично оновлювався без перебудови контейнера
+      - .:/app
 
   db:
     image: postgres:15
