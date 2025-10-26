@@ -52,10 +52,14 @@ async def list_tickets(
     }
 
 
-@router.get("/unassigned_tickets",)
+@router.get(
+    "/unassigned_tickets",
+)
 async def list_unassigned_tickets(
-    page: int = Query(1, ge=1, description="Номер сторінки"),
-    per_page: int = Query(10, ge=1, le=100, description="Кількість записів на сторінку"),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(
+        10, ge=1, le=100, description="Tickets count per page"
+    ),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_admin),
 ):
@@ -69,8 +73,8 @@ async def list_unassigned_tickets(
             "per_page": per_page,
             "total_items": total,
             "total_pages": total_pages,
-            "count": len(tickets)
-        }
+            "count": len(tickets),
+        },
     }
 
 

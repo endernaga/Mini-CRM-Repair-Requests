@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Body
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.authorization_crud import AuthCRUD
 from app.models.db_settings import get_db
 from app.schemas.authorization_schema import Login, Token
-from app.utils.jwt import create_access_token, create_refresh_token, decode_token
+from app.utils.jwt import (create_access_token, create_refresh_token,
+                           decode_token)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -24,8 +25,9 @@ async def login(form_data: Login, db: AsyncSession = Depends(get_db)):
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
+
 
 @router.post("/refresh", response_model=Token)
 async def refresh_token(refresh_token: str = Body(..., embed=True)):
@@ -39,4 +41,8 @@ async def refresh_token(refresh_token: str = Body(..., embed=True)):
 
     access_token = create_access_token({"user_id": user_id})
 
-    return {"access_token": access_token, "token_type": "bearer", "refresh_token": refresh_token}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "refresh_token": refresh_token,
+    }

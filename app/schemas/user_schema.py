@@ -27,8 +27,7 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     is_admin: Optional[bool] = None
 
+
 class PaginatedUsers(BaseModel):
     items: list[UserRead]
     pagination: dict
-
-

@@ -8,14 +8,19 @@ from starlette import status
 from app.crud.user_crud import UserCRUD
 from app.models import User
 from app.models.db_settings import get_db
-from app.schemas.user_schema import UserCreate, UserRead, UserUpdate, PaginatedUsers
+from app.schemas.user_schema import (PaginatedUsers, UserCreate, UserRead,
+                                     UserUpdate)
 from app.utils.dependencies import get_current_user_admin
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.post("/", response_model=UserRead)
-async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db), user_auth: User = Depends(get_current_user_admin),):
+async def create_user(
+    user: UserCreate,
+    db: AsyncSession = Depends(get_db),
+    user_auth: User = Depends(get_current_user_admin),
+):
     db_user = await UserCRUD.get_user_by_email(db, user.email)
     if db_user:
         raise HTTPException(
@@ -27,8 +32,10 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db), user
 
 @router.get("/", response_model=PaginatedUsers)
 async def list_users(
-    page: int = Query(1, ge=1, description="Номер сторінки"),
-    per_page: int = Query(10, ge=1, le=100, description="Кількість користувачів на сторінку"),
+    page: int = Query(1, ge=1, description="Page number"),
+    per_page: int = Query(
+        10, ge=1, le=100, description="Users count per page"
+    ),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user_admin),
 ):
@@ -42,13 +49,17 @@ async def list_users(
             "per_page": per_page,
             "total_items": total,
             "total_pages": total_pages,
-            "count": len(users)
-        }
+            "count": len(users),
+        },
     }
 
 
 @router.get("/{user_id}", response_model=UserRead)
-async def get_user(user_id: UUID, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user_admin),):
+async def get_user(
+    user_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user_admin),
+):
     db_user = await UserCRUD.get_user(db, user_id)
     if not db_user:
         raise HTTPException(
@@ -59,7 +70,10 @@ async def get_user(user_id: UUID, db: AsyncSession = Depends(get_db), user: User
 
 @router.put("/{user_id}", response_model=UserRead)
 async def update_user(
-    user_id: int, user: UserUpdate, db: AsyncSession = Depends(get_db), user_auth: User = Depends(get_current_user_admin),
+    user_id: int,
+    user: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+    user_auth: User = Depends(get_current_user_admin),
 ):
     db_user = await UserCRUD.update_user(db, user_id, user)
     if not db_user:
@@ -70,7 +84,11 @@ async def update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user_admin),):
+async def delete_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user_admin),
+):
     success = await UserCRUD.delete_user(db, user_id)
     if not success:
         raise HTTPException(

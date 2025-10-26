@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.models.client import Client
-from app.utils.security import hash_password
 
 
 class ClientCRUD:

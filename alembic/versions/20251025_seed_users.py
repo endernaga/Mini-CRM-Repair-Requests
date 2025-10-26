@@ -1,9 +1,10 @@
-from alembic import op
-from sqlalchemy.orm import Session
-from app.models.user import User
 import uuid
 from typing import Sequence, Union
 
+from sqlalchemy.orm import Session
+
+from alembic import op
+from app.models.user import User
 from app.utils.security import hash_password
 
 revision = "20251025_seed_users"
@@ -21,7 +22,7 @@ def upgrade():
         name="Admin User",
         email="admin@example.com",
         password=hash_password("admin123"),
-        is_admin=True
+        is_admin=True,
     )
 
     worker = User(
@@ -29,7 +30,7 @@ def upgrade():
         name="Worker User",
         email="worker@example.com",
         password=hash_password("worker123"),
-        is_admin=False
+        is_admin=False,
     )
 
     session.add_all([admin, worker])
@@ -40,5 +41,7 @@ def downgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    session.query(User).filter(User.email.in_(["admin@example.com", "worker@example.com"])).delete()
+    session.query(User).filter(
+        User.email.in_(["admin@example.com", "worker@example.com"])
+    ).delete()
     session.commit()

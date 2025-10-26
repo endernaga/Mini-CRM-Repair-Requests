@@ -6,7 +6,6 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 
 from app.crud.client_crud import ClientCRUD
-from app.models.client import Client
 from app.models.ticket import Ticket, TicketStatus
 from app.routers.user_route import get_user
 
@@ -96,7 +95,9 @@ class TicketCRUD:
         return result.scalars().all()
 
     @staticmethod
-    async def list_unassigned_tickets(db: AsyncSession, page: int = 1, per_page: int = 10):
+    async def list_unassigned_tickets(
+        db: AsyncSession, page: int = 1, per_page: int = 10
+    ):
         offset = (page - 1) * per_page
 
         total = await db.scalar(

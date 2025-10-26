@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import delete, update, func
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -25,17 +25,13 @@ class UserCRUD:
 
     @staticmethod
     async def get_users(
-            db: AsyncSession, page: int = 1, per_page: int = 10
+        db: AsyncSession, page: int = 1, per_page: int = 10
     ) -> tuple[list[User], int]:
         offset = (page - 1) * per_page
 
         total = await db.scalar(select(func.count()).select_from(User))
 
-        result = await db.execute(
-            select(User)
-            .offset(offset)
-            .limit(per_page)
-        )
+        result = await db.execute(select(User).offset(offset).limit(per_page))
 
         users = result.scalars().all()
         return users, total
@@ -59,7 +55,6 @@ class UserCRUD:
         if not db_user:
             return None
 
-        # Оновлюємо лише передані поля
         if user_data.name is not None:
             db_user.name = user_data.name
         if user_data.email is not None:
